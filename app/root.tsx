@@ -1,75 +1,86 @@
+import { useEffect, useState } from 'react';
 import {
-  isRouteErrorResponse,
   Links,
+  LiveReload,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
-} from "react-router";
+  useLoaderData,
+} from '@remix-run/react';
+import { json } from '@remix-run/node';
+import { useTranslation } from 'react-i18next';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import './utils/i18n';
+import styles from './styles/app.css';
 
-import type { Route } from "./+types/root";
-import "./app.css";
+// 导出加载样式表的函数
+export function links() {
+  return [{ rel: 'stylesheet', href: styles }];
+}
 
-export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
-  {
-    rel: "preconnect",
-    href: "https://fonts.gstatic.com",
-    crossOrigin: "anonymous",
-  },
-  {
-    rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
-  },
-];
+// 获取初始语言设置
+export async function loader({ request }) {
+  // 从请求中获取语言设置
+  const url = new URL(request.url);
+  const lang = url.searchParams.get('lang') || 'zh';
+  
+  return json({ lang });
+}
 
-export function Layout({ children }: { children: React.ReactNode }) {
+// 导出元数据配置
+export const meta = () => {
+  return [
+    { charset: 'utf-8' },
+    { viewport: 'width=device-width,initial-scale=1' },
+    { title: '公司官网' },
+    { description: '公司官方网站，展示公司信息、产品和服务' }
+  ];
+};
+
+// 根组件
+export default function App() {
+  const { lang: initialLang } = useLoaderData();
+  const { i18n } = useTranslation();
+  const [language, setLanguage] = useState(initialLang);
+  
+  // 语言切换函数
+  const changeLanguage = (lng) => {
+    setLanguage(lng);
+    i18n.changeLanguage(lng);
+    // 更新 HTML 元素的 lang 属性
+    document.documentElement.lang = lng;
+    // 存储在 localStorage 中
+    localStorage.setItem('i18nextLng', lng);
+  };
+
+  // 初始化时设置语言
+  useEffect(() => {
+    const savedLang = localStorage.getItem('i18nextLng') || initialLang;
+    if (savedLang) {
+      setLanguage(savedLang);
+      i18n.changeLanguage(savedLang);
+      document.documentElement.lang = savedLang;
+    }
+  }, [initialLang, i18n]);
+
   return (
-    <html lang="en">
+    <html lang={language} className="h-full">
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
-        {children}
+      <body className="flex flex-col min-h-screen bg-gray-50">
+        <Header currentLanguage={language} onChangeLanguage={changeLanguage} />
+        <main className="flex-grow">
+          <Outlet context={{ language }} />
+        </main>
+        <Footer />
         <ScrollRestoration />
         <Scripts />
+        <LiveReload />
       </body>
     </html>
-  );
-}
-
-export default function App() {
-  return <Outlet />;
-}
-
-export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
-
-  if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
-      error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
-  }
-
-  return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
-    </main>
   );
 }

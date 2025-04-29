@@ -1,0 +1,39 @@
+{
+    "navigation": {
+      "home": "首页",
+      "about": "公司介绍",
+      "resources": "原料资源",
+      "culture": "文化与我们",
+      "products": "产品展示",
+      "message": "在线留言",
+      "contact": "联系我们"
+    },
+    "buttons": {
+      "readMore": "了解更多",
+      "submit": "提交",
+      "cancel": "取消",
+      "send": "发送",
+      "login": "登录",
+      "logout": "退出登录"
+    },
+    "footer": {
+      "copyright": "版权所有",
+      "allRightsReserved": "保留所有权利",
+      "privacyPolicy": "隐私政策",
+      "termsOfService": "服务条款"
+    },
+    "language": {
+      "chinese": "中文",
+      "english": "English"
+    },
+    "forms": {
+      "name": "姓名",
+      "email": "电子邮箱",
+      "phone": "电话",
+      "message": "留言内容",
+      "company": "公司名称",
+      "required": "此字段为必填项",
+      "invalidEmail": "请输入有效的电子邮箱地址",
+      "messageSent": "您的留言已发送，我们将尽快回复您"
+    }
+  }

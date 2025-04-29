@@ -1,0 +1,39 @@
+{
+    "navigation": {
+      "home": "Home",
+      "about": "About Us",
+      "resources": "Resources",
+      "culture": "Culture & Us",
+      "products": "Products",
+      "message": "Message",
+      "contact": "Contact"
+    },
+    "buttons": {
+      "readMore": "Read More",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "send": "Send",
+      "login": "Login",
+      "logout": "Logout"
+    },
+    "footer": {
+      "copyright": "Copyright",
+      "allRightsReserved": "All Rights Reserved",
+      "privacyPolicy": "Privacy Policy",
+      "termsOfService": "Terms of Service"
+    },
+    "language": {
+      "chinese": "中文",
+      "english": "English"
+    },
+    "forms": {
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "message": "Message",
+      "company": "Company",
+      "required": "This field is required",
+      "invalidEmail": "Please enter a valid email address",
+      "messageSent": "Your message has been sent, we will reply to you as soon as possible"
+    }
+  }
