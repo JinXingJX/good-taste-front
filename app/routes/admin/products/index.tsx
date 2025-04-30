@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { json, useLoaderData } from '@remix-run/react';
+import { json, useLoaderData } from 'react-router';
 import { useTranslation } from 'react-i18next';
 
 // 服务器端数据加载

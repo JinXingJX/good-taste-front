@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from '@remix-run/react';
+import { useLocation } from 'react-router';
 
 export default function Sidebar({ user, onLogout, isSidebarOpen, setIsSidebarOpen }) {
   const { t } = useTranslation(['admin', 'common']);

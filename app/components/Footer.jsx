@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router';
 
 export default function Footer() {
   const { t } = useTranslation(['common']);

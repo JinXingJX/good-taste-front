@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { json, useActionData, useOutletContext } from '@remix-run/react';
+import { json, useActionData, useOutletContext } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { submitMessage } from '../utils/api';
@@ -52,7 +52,7 @@ export default function Message() {
   };
   
   return (
-    <div className="py-12 bg-gray-50">
+    (<div className="py-12 bg-gray-50">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
           <h1 className="text-3xl font-bold mb-8 text-center">
@@ -252,6 +252,6 @@ export default function Message() {
           </div>
         </div>
       </div>
-    </div>
+    </div>)
   );
 }

@@ -1,14 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-  useLoaderData,
-} from '@remix-run/react';
-import { redirect } from "react-router";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -19,12 +10,11 @@ import './utils/i18n';
 import './tailwind.css';
 
 // 获取初始语言设置
-export async function loader({ request }) {
+export async function loader({ request }: { request: Request }) {
   // 从请求中获取语言设置
   const url = new URL(request.url);
   const lang = url.searchParams.get('lang') || 'zh';
-  
-  return json({ lang });
+  return ({ lang });
 }
 
 // 导出元数据配置

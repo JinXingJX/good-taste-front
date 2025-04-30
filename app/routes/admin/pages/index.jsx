@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { json, useLoaderData } from '@remix-run/react';
+import { json, useLoaderData } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 

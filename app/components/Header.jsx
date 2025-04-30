@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from '@remix-run/react';
+import { Link, useLocation } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 

@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect } from 'react';
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from 'react-router';
 import jwtDecode from 'jwt-decode';
 import { login, logout } from '../utils/api';
 
