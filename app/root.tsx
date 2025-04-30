@@ -8,17 +8,15 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from '@remix-run/react';
-import { json } from '@remix-run/node';
+import { redirect } from "react-router";
 import { useTranslation } from 'react-i18next';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import './utils/i18n';
-import styles from './styles/app.css';
 
-// 导出加载样式表的函数
-export function links() {
-  return [{ rel: 'stylesheet', href: styles }];
-}
+// Import tailwind styles - if you're using a different location, adjust this import
+// The exact path will depend on your project setup
+import './tailwind.css';
 
 // 获取初始语言设置
 export async function loader({ request }) {
