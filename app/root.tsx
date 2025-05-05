@@ -5,19 +5,18 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import './utils/i18n';
 
-// Import tailwind styles - if you're using a different location, adjust this import
-// The exact path will depend on your project setup
+// Import tailwind styles
 import './tailwind.css';
 
-// 获取初始语言设置
+// Get initial language setting
 export async function loader({ request }: { request: Request }) {
-  // 从请求中获取语言设置
+  // Get language from request
   const url = new URL(request.url);
   const lang = url.searchParams.get('lang') || 'zh';
   return ({ lang });
 }
 
-// 导出元数据配置
+// Export metadata config
 export const meta = () => {
   return [
     { charset: 'utf-8' },
@@ -27,23 +26,23 @@ export const meta = () => {
   ];
 };
 
-// 根组件
+// Root component
 export default function App() {
-  const { lang: initialLang } = useLoaderData();
+  const { lang: initialLang } = useLoaderData<{ lang: string }>();
   const { i18n } = useTranslation();
   const [language, setLanguage] = useState(initialLang);
   
-  // 语言切换函数
-  const changeLanguage = (lng) => {
+  // Language change function
+  const changeLanguage = (lng: string) => {
     setLanguage(lng);
     i18n.changeLanguage(lng);
-    // 更新 HTML 元素的 lang 属性
+    // Update HTML element lang attribute
     document.documentElement.lang = lng;
-    // 存储在 localStorage 中
+    // Store in localStorage
     localStorage.setItem('i18nextLng', lng);
   };
 
-  // 初始化时设置语言
+  // Set language on initialization
   useEffect(() => {
     const savedLang = localStorage.getItem('i18nextLng') || initialLang;
     if (savedLang) {

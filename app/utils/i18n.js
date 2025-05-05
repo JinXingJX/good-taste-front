@@ -3,10 +3,16 @@ import { initReactI18next } from 'react-i18next';
 import Backend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
-// 配置i18next
+// Import translation files directly to ensure they're bundled
+import enCommon from '../locales/en/common.json';
+import enHome from '../locales/en/home.json';
+import zhCommon from '../locales/zh/common.json';
+import zhHome from '../locales/zh/home.json';
+
+// Configure i18next
 i18n
-  .use(Backend) // 按需加载翻译文件
-  .use(LanguageDetector) // 自动检测用户语言偏好
+  .use(Backend) // Load translations on-demand
+  .use(LanguageDetector) // Auto-detect user language preferences
   .use(initReactI18next)
   .init({
     fallbackLng: 'zh',
@@ -19,6 +25,16 @@ i18n
     detection: {
       order: ['localStorage', 'navigator'],
       caches: ['localStorage']
+    },
+    resources: {
+      en: {
+        common: enCommon,
+        home: enHome
+      },
+      zh: {
+        common: zhCommon,
+        home: zhHome
+      }
     },
     backend: {
       loadPath: '/locales/{{lng}}/{{ns}}.json',
