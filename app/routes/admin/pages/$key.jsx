@@ -1,7 +1,7 @@
 // app/routes/admin/pages/$key.jsx
 import { useState, useEffect, useContext } from 'react';
-import { json, useLoaderData, useParams, useNavigate, useFetcher, Form } from '@react-router/node';
 import { useTranslation } from 'react-i18next';
+import { json, useLoaderData, useParams, useNavigate, useFetcher, Form, redirect } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { getPage as apiGetPage, updatePage as apiUpdatePage } from '../../../utils/api'; // Use API functions
 import RichTextEditor from '../../../components/admin/RichTextEditor'; // Placeholder
@@ -23,7 +23,7 @@ export async function loader({ params, request }) {
         throw new Response("Page Not Found", { status: 404 });
     }
     return json({ page: pageData });
-  } catch (error: any) {
+  } catch (error/*: any*/) {
     console.error(`Error loading page ${pageKey}:`, error);
     // Handle specific errors (like 404) or re-throw for error boundary
     if (error.response?.status === 404) {
@@ -63,7 +63,7 @@ export async function action({ request, params }) {
             // seo_desc: updates.seo_desc,
         });
         return json({ success: true, page: updatedPage, message: 'Page saved successfully!' });
-    } catch (error: any) {
+    } catch (error/*: any*/) {
         console.error('Error saving page:', error);
          // Handle auth error potentially thrown by interceptor
         if (error.response?.status === 401) {

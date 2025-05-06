@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { json, useLoaderData } from 'react-router';
+import { json, useLoaderData, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
@@ -96,12 +96,12 @@ export default function AdminPages() {
                     {formatDate(page.updated_at)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a 
-                      href={`/admin/pages/${page.page_key}`} 
+                    <Link 
+                      to={`/admin/pages/${page.page_key}`} 
                       className="text-blue-600 hover:text-blue-900"
                     >
                       {t('admin:pages.edit')}
-                    </a>
+                    </Link>
                   </td>
                 </tr>
               ))}

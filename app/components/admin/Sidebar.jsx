@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import { useLocation, Link } from 'react-router-dom';
 
 export default function Sidebar({ user, onLogout, isSidebarOpen, setIsSidebarOpen }) {
   const { t } = useTranslation(['admin', 'common']);
@@ -115,9 +115,9 @@ export default function Sidebar({ user, onLogout, isSidebarOpen, setIsSidebarOpe
                            location.pathname.startsWith(`${item.path}/`);
           
           return (
-            <a
+            <Link
               key={item.path}
-              href={item.path}
+              to={item.path}
               className={`flex items-center px-4 py-3 text-gray-700 rounded-md transition-colors ${
                 isActive 
                   ? 'bg-blue-50 text-blue-600' 
@@ -128,7 +128,7 @@ export default function Sidebar({ user, onLogout, isSidebarOpen, setIsSidebarOpe
               {isSidebarOpen && (
                 <span className="ml-3">{item.label}</span>
               )}
-            </a>
+            </Link>
           );
         })}
       </nav>

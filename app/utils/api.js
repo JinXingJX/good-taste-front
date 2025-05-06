@@ -1,7 +1,6 @@
 // app/utils/api.js
 import axios from 'axios';
-import { redirect } from 'react-router'; // Import redirect for auth failures
-
+import { redirect } from 'react-router-dom'; 
 // API 基础 URL - Ensure this matches your Go backend address
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080/api';
 

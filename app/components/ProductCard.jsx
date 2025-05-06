@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export default function ProductCard({ product, language }) {
   const { t } = useTranslation(['products', 'common']);
