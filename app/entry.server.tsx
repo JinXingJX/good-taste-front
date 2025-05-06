@@ -3,7 +3,18 @@
  */
 import { StrictMode } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
-import { createStaticHandler, createStaticRouter, StaticRouterProvider } from '@react-router/node';
+import {
+    Links,
+    Meta,
+    Outlet,
+    Scripts,
+    ScrollRestoration,
+    LiveReload,
+    useLoaderData
+  } from '@remix-run/react';
+  
+  
+  
 import { I18nextProvider } from 'react-i18next';
 import i18n from './utils/i18n';
 import { PassThrough } from 'stream';

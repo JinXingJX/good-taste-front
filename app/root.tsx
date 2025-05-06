@@ -1,73 +1,87 @@
-import { useEffect, useState } from 'react';
-import { Links, Meta, Outlet, Scripts, ScrollRestoration, useLoaderData } from 'react-router';
-import { useTranslation } from 'react-i18next';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import './utils/i18n';
+// app/root.tsx
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  MetaFunction,
+  LinksFunction,
+} from "react-router";
 
-// Import tailwind styles
-import './tailwind.css';
+import { Suspense, useEffect } from 'react';
+import { I18nextProvider } from 'react-i18next';
+import i18n from './utils/i18n'; // Your i18n configuration
+import { LanguageProvider } from './context/LanguageContext';
+import { AuthProvider } from './context/AuthContext';
 
-// Get initial language setting
-export async function loader({ request }: { request: Request }) {
-  // Get language from request
-  const url = new URL(request.url);
-  const lang = url.searchParams.get('lang') || 'zh';
-  return ({ lang });
-}
+import styles from "./tailwind.css?url"; // Import Tailwind CSS
 
-// Export metadata config
-export const meta = () => {
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: styles },
+];
+
+export const meta: MetaFunction = () => {
   return [
-    { charset: 'utf-8' },
-    { viewport: 'width=device-width,initial-scale=1' },
-    { title: '公司官网' },
-    { description: '公司官方网站，展示公司信息、产品和服务' }
+    { title: "Good Taste International" }, // Default Title
+    { name: "description", content: "Welcome!" },
+    { charSet: "utf-8" },
+    { name: "viewport", content: "width=device-width, initial-scale=1" },
   ];
 };
 
-// Root component
-export default function App() {
-  const { lang: initialLang } = useLoaderData<{ lang: string }>();
-  const { i18n } = useTranslation();
-  const [language, setLanguage] = useState(initialLang);
-  
-  // Language change function
-  const changeLanguage = (lng: string) => {
-    setLanguage(lng);
-    i18n.changeLanguage(lng);
-    // Update HTML element lang attribute
-    document.documentElement.lang = lng;
-    // Store in localStorage
-    localStorage.setItem('i18nextLng', lng);
-  };
+// Function to get the initial language
+// Needs to run safely on both server and client
+const getInitialLanguage = (): string => {
+  if (typeof document !== 'undefined') {
+    // Client-side: Check localStorage first, then navigator
+    return localStorage.getItem('i18nextLng') || navigator.language.split('-')[0] || 'zh';
+  }
+  // Server-side: Default to 'zh' or try to detect from headers if needed (more complex)
+  return 'zh';
+};
 
-  // Set language on initialization
+
+export default function Root() {
+  const initialLang = getInitialLanguage(); // Get initial lang safely
+
   useEffect(() => {
-    const savedLang = localStorage.getItem('i18nextLng') || initialLang;
-    if (savedLang) {
-      setLanguage(savedLang);
-      i18n.changeLanguage(savedLang);
-      document.documentElement.lang = savedLang;
+    // Ensure HTML lang attribute is set on client-side mount/update
+    if (typeof document !== 'undefined') {
+       document.documentElement.lang = i18n.language || initialLang;
     }
-  }, [initialLang, i18n]);
+  }, []); // Runs once on mount
+
+  // Update lang attribute whenever i18n language changes
+  useEffect(() => {
+    const handleLanguageChange = (lng: string) => {
+       if (typeof document !== 'undefined') {
+          document.documentElement.lang = lng;
+       }
+    };
+    i18n.on('languageChanged', handleLanguageChange);
+    return () => {
+      i18n.off('languageChanged', handleLanguageChange);
+    };
+  }, []);
+
 
   return (
-    <html lang={language} className="h-full">
-      <head>
-        <Meta />
-        <Links />
-      </head>
-      <body className="flex flex-col min-h-screen bg-gray-50">
-        <Header currentLanguage={language} onChangeLanguage={changeLanguage} />
-        <main className="flex-grow">
-          <Outlet context={{ language }} />
-        </main>
-        <Footer />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
+    // No need for <html>, <head>, <body> here, React Router handles it.
+    // Wrap with Providers
+    <I18nextProvider i18n={i18n} defaultNS={'common'}>
+      <LanguageProvider> {/* Provides language state */}
+        <AuthProvider>   {/* Provides auth state */}
+           {/* Suspense for lazy loading translations or components */}
+           <Suspense fallback={<div>Loading...</div>}>
+             <Meta />
+             <Links />
+             <Outlet /> {/* Renders the matched route component */}
+             <ScrollRestoration /> {/* Handles scroll position */}
+             <Scripts /> {/* Includes necessary scripts */}
+           </Suspense>
+        </AuthProvider>
+      </LanguageProvider>
+    </I18nextProvider>
   );
 }
