@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from '@remix-run/react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { login } from '../../utils/api';
-import { Form } from '@remix-run/react';
+import { Form } from 'react-router-dom';
 
 export default function AdminLogin() {
   const { t } = useTranslation(['admin', 'common']);

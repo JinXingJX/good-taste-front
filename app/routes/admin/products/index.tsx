@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { json, useLoaderData } from '@remix-run/react';
+import { useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router-dom';
 
 // 服务器端数据加载
 export async function loader() {

@@ -1,10 +1,10 @@
 // app/routes/admin/messages/index.tsx
-import { json, useLoaderData, useFetcher, redirect } from '@remix-run/react';
+import { useLoaderData, useFetcher, redirect } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getMessages, deleteMessage, replyMessage } from "~/utils/api";
 import { useState } from "react";
 import Button from "~/components/ui/Button";
-import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/react';
+import type { LoaderFunctionArgs, ActionFunctionArgs } from 'react-router-dom';
 
 interface Message {
   id: string;

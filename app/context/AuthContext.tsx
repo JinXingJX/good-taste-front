@@ -1,6 +1,6 @@
 // app/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { useNavigate, useLocation } from '@remix-run/react'; // Use hooks from react-router
+import { useNavigate, useLocation } from 'react-router-dom'; // Use hooks from react-router
 import { jwtDecode } from 'jwt-decode'; // Correct named import
 import { login as apiLogin, logout as apiLogout } from '../utils/api'; // Use api functions
 

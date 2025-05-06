@@ -7,7 +7,7 @@ import router from './router'; // Updated to use default import
 import { I18nextProvider } from 'react-i18next';
 import i18n from './utils/i18n';
 
-import './tailwind.css';
+import './app.css';
 
 // Removed Remix links function
 // export const links: LinksFunction = () => [

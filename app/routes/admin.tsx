@@ -1,11 +1,9 @@
 // app/routes/admin.tsx (New File)
 import { useState, useEffect } from 'react';
-import { Outlet, useLoaderData, redirect, useLocation, useNavigate } from '@remix-run/react';
-import { json } from '@remix-run/react'; // Use json from node
-import Sidebar from '~/components/admin/Sidebar';
+import { Outlet, useLoaderData, redirect, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '~/context/AuthContext'; // Use the custom hook
 import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
-import { Link } from '@remix-run/react';
+import { Link } from 'react-router-dom';
 
 
 // Loader function to check authentication before rendering admin routes

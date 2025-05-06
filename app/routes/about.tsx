@@ -1,15 +1,23 @@
 // app/routes/about.tsx (New File)
-import { json, useLoaderData } from '@remix-run/react';
+import { useLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getPage } from "~/utils/api";
+import { getPage } from "../utils/api";
 import { useContext } from "react";
-import LanguageContext from "~/context/LanguageContext";
+import LanguageContext from "../context/LanguageContext";
 
 export async function loader() {
     try {
-        // Fetch data specific to the 'about' page
-        const pageData = await getPage('about'); // Assuming 'about' is the key
-        return json({ page: pageData });
+        // Fetch data for both languages
+        const enPageData = await getPage('about', 'en');
+        const zhPageData = await getPage('about', 'zh');
+        return { 
+            page: {
+                title_en: enPageData.title,
+                content_en: enPageData.content,
+                title_zh: zhPageData.title,
+                content_zh: zhPageData.content
+            } 
+        };
     } catch (error) {
         console.error("Error loading about page:", error);
         throw new Response("Not Found", { status: 404 }); // Or handle error differently

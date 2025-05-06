@@ -1,4 +1,4 @@
-import { Form } from '@remix-run/react';
+import { Form } from 'react-router-dom';
 
 export default function AdminPageEdit() {
   return (
