@@ -4,6 +4,9 @@ import { redirect } from 'react-router-dom';
 // API 基础 URL - Ensure this matches your Go backend address
 const API_BASE_URL = process.env.API_BASE_URL || 'http://localhost:8080/api';
 
+// Check if we're in a browser environment
+const isBrowser = typeof window !== 'undefined' && window.localStorage;
+
 // 创建 axios 实例
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -16,9 +19,11 @@ const apiClient = axios.create({
 // 请求拦截器：添加认证 token (assuming Bearer token in localStorage)
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token && !config.url.includes('/auth/login')) { // Don't add token to login request
-      config.headers.Authorization = `Bearer ${token}`;
+    if (isBrowser) {
+      const token = localStorage.getItem('token');
+      if (token && !config.url.includes('/auth/login')) { // Don't add token to login request
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
     return config;
   },
@@ -40,7 +45,8 @@ apiClient.interceptors.response.use(
       error.response &&
       error.response.status === 401 &&
       !originalRequest._retry &&
-      !originalRequest.url.includes('/auth/login') // Avoid redirect loop on login failure
+      !originalRequest.url.includes('/auth/login') && // Avoid redirect loop on login failure
+      isBrowser // Only attempt localStorage operations in browser
       // Add && originalRequest.url !== '/auth/refresh' if you implement refresh
     ) {
        originalRequest._retry = true; // Prevent infinite loops
@@ -105,11 +111,11 @@ export const login = async (credentials) => {
   console.log('API: Attempting login for:', credentials.username);
   const response = await apiClient.post('/auth/login', credentials);
   // Save token if login is successful
-  if (response.data.token) {
+  if (response.data.token && isBrowser) {
     localStorage.setItem('token', response.data.token);
     console.log('API: Login successful, token stored.');
   }
-  // if (response.data.refreshToken) { // If using refresh tokens
+  // if (response.data.refreshToken && isBrowser) { // If using refresh tokens
   //   localStorage.setItem('refreshToken', response.data.refreshToken);
   // }
   return response.data; // Expected: { token: "...", user: { id, username, role } } or error
@@ -125,9 +131,11 @@ export const logout = async () => {
      // Ignore errors on logout, just clear local storage
      console.warn('API: Backend logout failed (may not be implemented):', error);
   } finally {
-     localStorage.removeItem('token');
-     localStorage.removeItem('refreshToken'); // If using refresh tokens
-     console.log('API: Local tokens cleared.');
+     if (isBrowser) {
+       localStorage.removeItem('token');
+       localStorage.removeItem('refreshToken'); // If using refresh tokens
+       console.log('API: Local tokens cleared.');
+     }
   }
 };
 
