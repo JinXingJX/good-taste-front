@@ -1,5 +1,5 @@
 // app/routes/products/index.tsx (New File)
-import { json, useLoaderData } from "react-router";
+import { json, useLoaderData } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
 import { getProducts } from "~/utils/api"; // Use getProducts API
 import { useContext } from "react";

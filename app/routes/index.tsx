@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { json, useLoaderData, useOutletContext } from 'react-router';
+import { json, useLoaderData, useOutletContext } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
 import { getPage, getProducts } from '../utils/api';
 

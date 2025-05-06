@@ -1,24 +1,10 @@
 /**
- * Server entry point
+ * Server entry point for React Router v7
  */
 import { StrictMode } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
-import {
-    Links,
-    Meta,
-    Outlet,
-    Scripts,
-    ScrollRestoration,
-    LiveReload,
-    useLoaderData
-  } from '@remix-run/react';
-  
-  
-  
-import { I18nextProvider } from 'react-i18next';
-import i18n from './utils/i18n';
+import { createStaticHandler, createStaticRouter, StaticRouterProvider } from 'react-router-dom';
 import { PassThrough } from 'stream';
-import type { EntryContext } from '@react-router/node';
 
 // Import routes
 import routes from './routes';
@@ -27,35 +13,53 @@ export default async function handleRequest(
   request: Request,
   responseStatusCode: number,
   responseHeaders: Headers,
-  remixContext: EntryContext
 ) {
+  // Create a static handler for the routes
   const { query, dataRoutes } = createStaticHandler(routes);
-  const remixRequest = createFetchRequest(request);
   
-  const context = await query(remixRequest);
+  // Process the request with the handler
+  const context = await query(request);
   
+  // If the context is a Response, return it directly
   if (context instanceof Response) {
     return context;
   }
   
+  // Create a static router with the context
   const router = createStaticRouter(dataRoutes, context);
   
   return new Promise((resolve) => {
     const { pipe } = renderToPipeableStream(
       <StrictMode>
-        <I18nextProvider i18n={i18n}>
-          <StaticRouterProvider router={router} context={context} />
-        </I18nextProvider>
+        <StaticRouterProvider router={router} context={context} />
       </StrictMode>,
       {
         onAllReady() {
           responseHeaders.set('Content-Type', 'text/html');
           
           const body = new PassThrough();
-          pipe(body);
+          
+          // Create a Web Stream from the PassThrough stream
+          const stream = new ReadableStream({
+            start(controller) {
+              pipe(body);
+              
+              body.on('data', (chunk) => {
+                controller.enqueue(chunk);
+              });
+              
+              body.on('end', () => {
+                controller.close();
+              });
+              
+              body.on('error', (err) => {
+                controller.error(err);
+              });
+            },
+          });
           
           resolve(
-            new Response(body, {
+            new Response(stream, {
               status: responseStatusCode,
               headers: responseHeaders,
             })
@@ -72,16 +76,5 @@ export default async function handleRequest(
         },
       }
     );
-  });
-}
-
-// Helper function to convert Request to standard fetch Request
-function createFetchRequest(req: Request): Request {
-  const url = new URL(req.url);
-  
-  return new Request(url.href, {
-    method: req.method,
-    headers: req.headers,
-    body: req.body,
   });
 }

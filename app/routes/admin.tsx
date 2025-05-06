@@ -1,10 +1,11 @@
 // app/routes/admin.tsx (New File)
 import { useState, useEffect } from 'react';
-import { Outlet, useLoaderData, redirect, useLocation } from 'react-router';
-import { json } from '@react-router/node'; // Use json from node
+import { Outlet, useLoaderData, redirect, useLocation, useNavigate } from '@remix-run/react';
+import { json } from '@remix-run/react'; // Use json from node
 import Sidebar from '~/components/admin/Sidebar';
 import { useAuth } from '~/context/AuthContext'; // Use the custom hook
 import { jwtDecode } from 'jwt-decode'; // Import jwtDecode
+import { Link } from '@remix-run/react';
 
 
 // Loader function to check authentication before rendering admin routes
@@ -95,20 +96,18 @@ export default function AdminLayout() {
 
   // User is authenticated, render the admin layout
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Sidebar
-        user={user} // Pass the user object from context
-        onLogout={logout} // Pass the logout function from context
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Optional: Add an Admin Header here */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
-          {/* Render the specific admin page (Dashboard, Pages, Products, etc.) */}
-          <Outlet />
-        </main>
-      </div>
+    <div className="admin-layout">
+      <nav className="admin-nav">
+        <Link to="/admin">Dashboard</Link>
+        <Link to="/admin/pages">Pages</Link>
+        <Link to="/admin/products">Products</Link>
+        <Link to="/admin/messages">Messages</Link>
+        <Link to="/admin/users">Users</Link>
+        <Link to="/admin/settings">Settings</Link>
+      </nav>
+      <main className="admin-content">
+        <Outlet />
+      </main>
     </div>
   );
 }

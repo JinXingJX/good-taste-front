@@ -1,29 +1,40 @@
-// app/routes/admin/messages/index.tsx (New File)
-import { json, useLoaderData, useFetcher, redirect } from "react-router";
+// app/routes/admin/messages/index.tsx
+import { json, useLoaderData, useFetcher, redirect } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
-import { getMessages, deleteMessage, replyMessage } from "~/utils/api"; // API functions
+import { getMessages, deleteMessage, replyMessage } from "~/utils/api";
 import { useState } from "react";
-import Button from "~/components/ui/Button"; // Assuming UI components
+import Button from "~/components/ui/Button";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from '@remix-run/react';
 
-export async function loader({ request }) {
+interface Message {
+  id: string;
+  content: string;
+  createdAt: string;
+  // Add other message properties as needed
+}
+
+interface LoaderData {
+  messages: Message[];
+  error?: string;
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        // Add pagination params if needed: const url = new URL(request.url); ...
-        const messagesData = await getMessages(); // Fetch messages
+        const messagesData = await getMessages();
         const messages = Array.isArray(messagesData) ? messagesData : messagesData?.messages || [];
-        return json({ messages });
+        return json<LoaderData>({ messages });
     } catch (error: any) {
         console.error("Error loading messages:", error);
-         if (error.response?.status === 401) {
-             console.log("Loader: Caught 401, redirecting to login.");
-             const url = new URL(request.url);
-             return redirect(`/admin/login?redirectTo=${url.pathname}`);
-         }
-        return json({ messages: [], error: "Failed to load messages." });
+        if (error.response?.status === 401) {
+            console.log("Loader: Caught 401, redirecting to login.");
+            const url = new URL(request.url);
+            return redirect(`/admin/login?redirectTo=${url.pathname}`);
+        }
+        return json<LoaderData>({ messages: [], error: "Failed to load messages." });
     }
 }
 
-// Action for deleting or replying (example)
-export async function action({ request }) {
+export async function action({ request }: ActionFunctionArgs) {
     const formData = await request.formData();
     const intent = formData.get('intent');
     const messageId = formData.get('messageId');
@@ -40,113 +51,103 @@ export async function action({ request }) {
             const replyContent = formData.get('replyContent');
             if (!replyContent) return json({ success: false, error: 'Reply content missing' }, { status: 400 });
             await replyMessage(messageId, { reply: replyContent });
-             return json({ success: true, message: `Replied to message ${messageId}.` });
+            return json({ success: true, message: `Replied to message ${messageId}.` });
         }
         return json({ success: false, error: 'Invalid intent' }, { status: 400 });
     } catch (error: any) {
-         console.error(`Action error (intent: ${intent}):`, error);
-         if (error.response?.status === 401) {
-             console.log("Action: Caught 401, redirecting to login.");
-             const url = new URL(request.url);
-             return redirect(`/admin/login?redirectTo=${url.pathname}`);
-         }
-         return json({ success: false, error: `Failed to ${intent} message.` }, { status: 500 });
+        console.error(`Action error (intent: ${intent}):`, error);
+        if (error.response?.status === 401) {
+            console.log("Action: Caught 401, redirecting to login.");
+            const url = new URL(request.url);
+            return redirect(`/admin/login?redirectTo=${url.pathname}`);
+        }
+        return json({ success: false, error: `Failed to ${intent} message.` }, { status: 500 });
     }
 }
 
+export default function AdminMessages() {
+    const data = useLoaderData<LoaderData>();
+    const { t } = useTranslation();
+    const fetcher = useFetcher();
+    const [replyingTo, setReplyingTo] = useState<string | null>(null);
 
-export default function AdminMessagesPage() {
-  const { messages, error: loaderError } = useLoaderData<typeof loader>();
-  const { t } = useTranslation(['admin', 'common']);
-  const fetcher = useFetcher<typeof action>();
-  const [replyingTo, setReplyingTo] = useState<number | null>(null);
-  const [replyContent, setReplyContent] = useState('');
+    const messages = data.messages;
 
-  const handleDelete = (id: number | string) => {
-    if (confirm(t('admin:messages.confirmDelete', 'Are you sure you want to delete this message?'))) {
-      fetcher.submit({ intent: 'delete', messageId: id.toString() }, { method: 'post' });
-    }
-  };
-
-   const handleReplySubmit = (id: number | string) => {
-       fetcher.submit(
-           { intent: 'reply', messageId: id.toString(), replyContent: replyContent },
-           { method: 'post' }
-       );
-       setReplyingTo(null); // Close reply form after submission
-       setReplyContent('');
-   };
-
-   const formatDate = (dateString) => {
-     // Simple date formatter
-     try {
-       return new Intl.DateTimeFormat('zh-CN', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(dateString));
-     } catch { return dateString; }
-   };
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">{t('admin:messages.title', 'Manage Messages')}</h1>
-
-       {loaderError && <p className="text-red-600 mb-4">{loaderError}</p>}
-       {fetcher.data && !fetcher.data.success && <p className="text-red-600 mb-4">{fetcher.data.error}</p>}
-       {fetcher.data && fetcher.data.success && <p className="text-green-600 mb-4">{fetcher.data.message}</p>}
-
-
-      <div className="bg-white rounded-lg shadow-sm overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.name')}</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.email')}</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.phone')}</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.content')}</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.received')}</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.status')}</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{t('admin:messages.actions')}</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {messages && messages.length > 0 ? messages.map((msg) => (
-              <tr key={msg.id}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{msg.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{msg.email}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{msg.phone || '-'}</td>
-                <td className="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">{msg.content}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{formatDate(msg.created_at)}</td>
-                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {/* Display status based on msg.status or msg.reply */}
-                    {msg.reply ? <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">{t('admin:messages.replied')}</span> : <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">{t('admin:messages.pending')}</span>}
-                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
-                   <button onClick={() => setReplyingTo(replyingTo === msg.id ? null : msg.id)} className="text-blue-600 hover:text-blue-900">{replyingTo === msg.id ? t('common:buttons.cancel') : t('admin:messages.reply')}</button>
-                   <button onClick={() => handleDelete(msg.id)} className="text-red-600 hover:text-red-900">{t('admin:messages.delete')}</button>
-                </td>
-              </tr>
-               {/* Reply Form */}
-                {replyingTo === msg.id && (
-                    <tr>
-                        <td colSpan={7} className="p-4 bg-gray-50">
-                             <textarea
-                                 value={replyContent}
-                                 onChange={(e) => setReplyContent(e.target.value)}
-                                 rows={3}
-                                 className="w-full border border-gray-300 rounded-md p-2 mb-2"
-                                 placeholder={t('admin:messages.replyPlaceholder')}
-                             />
-                             <Button onClick={() => handleReplySubmit(msg.id)} size="sm">
-                                 {t('admin:messages.sendReply')}
-                             </Button>
-                        </td>
-                    </tr>
-                )}
-            )) : (
-              <tr><td colSpan={7} className="text-center py-4 text-gray-500">{t('admin:messages.noMessages')}</td></tr>
+    return (
+        <div className="admin-messages p-6">
+            <h1 className="text-2xl font-bold mb-6">{t('messages.title', 'Messages')}</h1>
+            {data.error && (
+                <div className="text-red-600 mb-4">{data.error}</div>
             )}
-          </tbody>
-        </table>
-        {/* Add pagination controls if needed */}
-      </div>
-    </div>
-  );
+            <div className="messages-list space-y-4">
+                {messages.length === 0 ? (
+                    <p className="text-gray-500">{t('messages.noMessages', 'No messages found.')}</p>
+                ) : (
+                    messages.map((message: Message) => (
+                        <div key={message.id} className="border rounded-lg p-4">
+                            <div className="flex justify-between items-start">
+                                <div>
+                                    <p className="text-gray-700">{message.content}</p>
+                                    <p className="text-sm text-gray-500 mt-2">
+                                        {new Date(message.createdAt).toLocaleString()}
+                                    </p>
+                                </div>
+                                <div className="flex gap-2">
+                                    <Button
+                                        onClick={() => setReplyingTo(message.id)}
+                                        variant="secondary"
+                                        aria-label={t('messages.reply', 'Reply')}
+                                    >
+                                        {t('messages.reply', 'Reply')}
+                                    </Button>
+                                    <fetcher.Form method="post">
+                                        <input type="hidden" name="messageId" value={message.id} />
+                                        <input type="hidden" name="intent" value="delete" />
+                                        <Button
+                                            type="submit"
+                                            variant="danger"
+                                            aria-label={t('messages.delete', 'Delete')}
+                                        >
+                                            {t('messages.delete', 'Delete')}
+                                        </Button>
+                                    </fetcher.Form>
+                                </div>
+                            </div>
+                            {replyingTo === message.id && (
+                                <fetcher.Form method="post" className="mt-4">
+                                    <input type="hidden" name="messageId" value={message.id} />
+                                    <input type="hidden" name="intent" value="reply" />
+                                    <label htmlFor={`reply-${message.id}`} className="sr-only">
+                                        {t('messages.replyContent', 'Reply content')}
+                                    </label>
+                                    <textarea
+                                        id={`reply-${message.id}`}
+                                        name="replyContent"
+                                        className="w-full p-2 border rounded"
+                                        rows={3}
+                                        required
+                                        aria-label={t('messages.replyContent', 'Reply content')}
+                                        placeholder={t('messages.replyPlaceholder', 'Type your reply here...')}
+                                    />
+                                    <div className="flex gap-2 mt-2">
+                                        <Button type="submit" aria-label={t('messages.sendReply', 'Send Reply')}>
+                                            {t('messages.sendReply', 'Send Reply')}
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={() => setReplyingTo(null)}
+                                            aria-label={t('messages.cancel', 'Cancel')}
+                                        >
+                                            {t('messages.cancel', 'Cancel')}
+                                        </Button>
+                                    </div>
+                                </fetcher.Form>
+                            )}
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    );
 }

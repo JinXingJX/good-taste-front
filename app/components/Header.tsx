@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router';
+import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from './LanguageSwitcher';
 
@@ -14,7 +14,7 @@ export default function Header({ currentLanguage, onChangeLanguage }: HeaderProp
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
   // Check if current route is active
-  const isActive = (path) => {
+  const isActive = (path: string) => {
     return location.pathname === path || location.pathname.startsWith(`${path}/`);
   };
   

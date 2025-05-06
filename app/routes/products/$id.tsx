@@ -1,5 +1,5 @@
 // app/routes/products/$id.tsx (New File)
-import { json, useLoaderData, useParams } from "react-router";
+import { json, useLoaderData, useParams } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
 import { getProductById } from "~/utils/api"; // Use getProductById API
 import { useContext } from "react";

@@ -1,5 +1,5 @@
 // app/routes/message.tsx (New File)
-import { json, useFetcher, Form } from "react-router";
+import { json, useFetcher, Form } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { submitMessage } from "~/utils/api";

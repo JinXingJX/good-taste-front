@@ -1,6 +1,6 @@
 // app/context/AuthContext.jsx
 import { createContext, useState, useEffect, useContext, useCallback } from 'react';
-import { useNavigate, useLocation } from 'react-router'; // Use hooks from react-router
+import { useNavigate, useLocation } from '@remix-run/react'; // Use hooks from react-router
 import { jwtDecode } from 'jwt-decode'; // Correct named import
 import { login as apiLogin, logout as apiLogout } from '../utils/api'; // Use api functions
 
@@ -11,10 +11,15 @@ interface User {
   role: string;
 }
 
+interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (credentials: any) => Promise<{ success: boolean; error?: string }>;
+  login: (credentials: LoginCredentials) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
   isAdmin: boolean;
@@ -83,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // Login function
-  const handleLogin = useCallback(async (credentials: any) => {
+  const handleLogin = useCallback(async (credentials: LoginCredentials) => {
     setLoading(true);
     try {
       const data = await apiLogin(credentials); // Call the API function

@@ -1,6 +1,6 @@
 // app/routes/admin/pages/$key.jsx
 import { useState, useEffect, useContext } from 'react';
-import { json, useLoaderData, useParams, useNavigate, useFetcher, Form } from 'react-router';
+import { json, useLoaderData, useParams, useNavigate, useFetcher, Form } from '@react-router/node';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { getPage as apiGetPage, updatePage as apiUpdatePage } from '../../../utils/api'; // Use API functions

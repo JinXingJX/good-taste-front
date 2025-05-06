@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
+import { useNavigate } from '@remix-run/react';
 import { useTranslation } from 'react-i18next';
 import { useForm } from 'react-hook-form';
 import { login } from '../../utils/api';
+import { Form } from '@remix-run/react';
 
 export default function AdminLogin() {
   const { t } = useTranslation(['admin', 'common']);
@@ -66,7 +67,7 @@ export default function AdminLogin() {
           </div>
         )}
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Form method="post" className="space-y-6">
           <div>
             <label 
               htmlFor="username" 
@@ -77,6 +78,7 @@ export default function AdminLogin() {
             <input
               id="username"
               type="text"
+              name="username"
               {...register('username', { required: true })}
               className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${
                 errors.username ? 'border-red-500' : 'border-gray-300'
@@ -99,6 +101,7 @@ export default function AdminLogin() {
             <input
               id="password"
               type="password"
+              name="password"
               {...register('password', { required: true })}
               className={`w-full px-4 py-2 border rounded-md focus:ring-blue-500 focus:border-blue-500 ${
                 errors.password ? 'border-red-500' : 'border-gray-300'
@@ -134,7 +137,7 @@ export default function AdminLogin() {
               )}
             </button>
           </div>
-        </form>
+        </Form>
         
         <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
           <p>
