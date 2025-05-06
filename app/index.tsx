@@ -1,10 +1,21 @@
 import { useEffect } from 'react';
 import { useLoaderData, useOutletContext } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getPage, getProducts } from '../utils/api';
+import { getPage, getProducts, type Page, type Product } from '../utils/api';
+
+// Define types for the loader and context
+interface LoaderData {
+  pageData: Page;
+  featuredProducts: Product[];
+  lang: string;
+}
+
+interface OutletContext {
+  language: string;
+}
 
 // Server-side data loading using Router v7 loader
-export async function loader({ request }) {
+export async function loader({ request }: { request: Request }) {
   const url = new URL(request.url);
   const lang = url.searchParams.get('lang') || 'zh';
   
@@ -12,14 +23,14 @@ export async function loader({ request }) {
     // Load homepage content and featured products in parallel
     const [pageData, featuredProducts] = await Promise.all([
       getPage('home', lang),
-      getProducts({ featured: true, limit: 3 }, lang)
+      getProducts()
     ]);
     
     return { pageData, featuredProducts, lang };
   } catch (error) {
     console.error('Error loading home page data:', error);
     return { 
-      pageData: { title: '', content: '' }, 
+      pageData: { id: '', title: '', content: '', language: lang }, 
       featuredProducts: [],
       lang 
     };
@@ -27,8 +38,8 @@ export async function loader({ request }) {
 }
 
 export default function Index() {
-  const { pageData, featuredProducts, lang } = useLoaderData();
-  const { language } = useOutletContext();
+  const { pageData, featuredProducts, lang } = useLoaderData() as LoaderData;
+  const { language } = useOutletContext() as OutletContext;
   const { t, i18n } = useTranslation(['home', 'common']);
   
   // Update content when language changes
@@ -121,17 +132,17 @@ export default function Index() {
             </div>
             
             <div className="grid md:grid-cols-3 gap-8">
-              {featuredProducts.map((product) => (
+              {featuredProducts.map((product: Product) => (
                 <a 
                   key={product.id} 
                   href={`/products/${product.id}`}
                   className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="aspect-w-16 aspect-h-9 bg-gray-200">
-                    {product.image_url ? (
+                    {product.image ? (
                       <img 
-                        src={product.image_url} 
-                        alt={language === 'zh' ? product.name_zh : product.name_en} 
+                        src={product.image} 
+                        alt={product.name} 
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -142,10 +153,10 @@ export default function Index() {
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-semibold mb-2">
-                      {language === 'zh' ? product.name_zh : product.name_en}
+                      {product.name}
                     </h3>
                     <p className="text-gray-600 line-clamp-3">
-                      {language === 'zh' ? product.desc_zh : product.desc_en}
+                      {product.description}
                     </p>
                   </div>
                 </a>
@@ -228,4 +239,4 @@ export default function Index() {
       </section>
     </div>
   );
-}
+} 

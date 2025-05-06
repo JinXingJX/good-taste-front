@@ -1,14 +1,18 @@
-// app/routes/culture.tsx (New File)
-import { json, useLoaderData } from '@remix-run/react';
+// app/routes/culture.tsx
+import { useLoaderData, type LoaderFunctionArgs } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getPage } from "~/utils/api";
+import { getPage } from "../utils/api.js";
 import { useContext } from "react";
 import LanguageContext from "~/context/LanguageContext";
 
-export async function loader() {
+export async function loader({ request }: LoaderFunctionArgs) {
     try {
-        const pageData = await getPage('culture'); // Use 'culture' page key
-        return json({ page: pageData });
+        // Get the language from the URL or default to 'zh'
+        const url = new URL(request.url);
+        const lang = url.searchParams.get('lang') || 'zh';
+        
+        const pageData = await getPage('culture', lang); // Pass language parameter
+        return { page: pageData };
     } catch (error) {
         console.error("Error loading culture page:", error);
         throw new Response("Not Found", { status: 404 });
@@ -16,7 +20,7 @@ export async function loader() {
 }
 
 export default function CulturePage() {
-  const { page } = useLoaderData<typeof loader>();
+  const { page } = useLoaderData() as { page: any };
   const { t } = useTranslation('culture'); // Assuming a 'culture' namespace
   const { language } = useContext(LanguageContext);
 

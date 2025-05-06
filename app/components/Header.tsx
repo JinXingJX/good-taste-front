@@ -77,6 +77,8 @@ export default function Header({ currentLanguage, onChangeLanguage }: HeaderProp
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-md text-gray-700 hover:text-blue-600 focus:outline-none"
+              aria-label={isMenuOpen ? t('navigation.closeMenu') : t('navigation.openMenu')}
+              title={isMenuOpen ? t('navigation.closeMenu') : t('navigation.openMenu')}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -127,7 +129,7 @@ export default function Header({ currentLanguage, onChangeLanguage }: HeaderProp
               <li className="pt-2 border-t border-gray-200">
                 <LanguageSwitcher 
                   currentLanguage={currentLanguage}
-                  onChangeLanguage={(lang) => {
+                  onChangeLanguage={(lang: string) => {
                     onChangeLanguage(lang);
                     setIsMenuOpen(false);
                   }}

@@ -1,14 +1,16 @@
-// app/routes/resources.tsx (New File)
-import { json, useLoaderData } from '@remix-run/react';
+// app/routes/resources.tsx
+import { useRouteLoaderData } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getPage } from "~/utils/api";
+import { getPage } from "../utils/api";
 import { useContext } from "react";
-import LanguageContext from "~/context/LanguageContext";
+import LanguageContext from "../context/LanguageContext";
 
-export async function loader() {
+export async function loader({ request }: { request: Request }) {
     try {
-        const pageData = await getPage('resources'); // Use 'resources' page key
-        return json({ page: pageData });
+        // Default to English if no language specified
+        const language = new URL(request.url).searchParams.get('language') || 'en';
+        const pageData = await getPage('resources', language);
+        return { page: pageData };
     } catch (error) {
         console.error("Error loading resources page:", error);
         throw new Response("Not Found", { status: 404 });
@@ -16,10 +18,11 @@ export async function loader() {
 }
 
 export default function ResourcesPage() {
-  const { page } = useLoaderData<typeof loader>();
+  const data = useRouteLoaderData('resources') as { page: any };
   const { t } = useTranslation('resources'); // Assuming a 'resources' namespace
   const { language } = useContext(LanguageContext);
 
+  const page = data?.page;
   const title = language === 'zh' ? page?.title_zh : page?.title_en;
   const content = language === 'zh' ? page?.content_zh : page?.content_en;
 

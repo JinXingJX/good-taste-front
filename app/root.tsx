@@ -2,7 +2,7 @@
 // import { ... } from '@remix-run/react'; // Entire import block removed
 
 import { StrictMode, Suspense } from 'react';
-import { RouterProvider } from 'react-router-dom';
+import { RouterProvider, Router } from 'react-router-dom';
 import router from './router'; // Updated to use default import
 import { I18nextProvider } from 'react-i18next';
 import i18n from './utils/i18n';
@@ -34,7 +34,28 @@ import './tailwind.css';
 // const router = createBrowserRouter([ ... ]);
 
 export default function Root() {
-  // The main Root component now just renders the RouterProvider with the router from app/router.tsx
+  // Only render the router provider on the client side
+  if (typeof window === 'undefined') {
+    return (
+      <StrictMode>
+        <I18nextProvider i18n={i18n}>
+          <div className="flex items-center justify-center min-h-screen">Loading...</div>
+        </I18nextProvider>
+      </StrictMode>
+    );
+  }
+
+  // Ensure router is available (only created in browser environment)
+  if (!router) {
+    return (
+      <StrictMode>
+        <I18nextProvider i18n={i18n}>
+          <div className="flex items-center justify-center min-h-screen">Loading...</div>
+        </I18nextProvider>
+      </StrictMode>
+    );
+  }
+
   return (
     <StrictMode>
       <I18nextProvider i18n={i18n}>
